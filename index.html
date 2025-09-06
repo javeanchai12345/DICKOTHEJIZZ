@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Character Customizer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    /* Character centered */
+    #avatar {
+      position: relative;
+      width: 400px;
+      margin: 20px auto; /* centers horizontally */
+    }
+    #avatar img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+    #hat {
+      display: none;
+      z-index: 10;
+    }
+
+    /* Controls separated */
+    .controls {
+      margin-top: 20px;
+      width: 400px;          /* same width as character */
+      margin-left: auto;
+      margin-right: auto;    /* keeps it aligned with the avatar */
+      text-align: left;      /* align content to the left */
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align:center;">My Character</h2>
+
+  <div>
+    <label for="hatToggle">Toggle Hat: </label>
+    <select id="hatToggle" name="D1">
+      <option value="none">No Hat</option>
+      <option value="show">Show Hat</option>
+    </select>
+  
+  <button id="downloadBtn">Download Character</button>
+  </div>
+
+<div id="avatar">
+  <img id="body" src="https://i.imgur.com/6BklH1x.png" alt="Base Character" style="left: 0; top: 0">
+  <img id="hat" src="https://i.imgur.com/rtiLWtU.png" alt="Hat">
+</div>
+
+<div class="controls">
+</div>
+
+<script>
+  const hatToggle = document.getElementById("hatToggle");
+  const hat = document.getElementById("hat");
+  const body = document.getElementById("body");
+
+  hatToggle.addEventListener("change", function() {
+    hat.style.display = this.value === "show" ? "block" : "none";
+  });
+
+  document.getElementById("downloadBtn").addEventListener("click", function() {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = body.naturalWidth;
+    canvas.height = body.naturalHeight;
+
+    const bodyImg = new Image();
+    const hatImg = new Image();
+
+    bodyImg.crossOrigin = "anonymous";
+    hatImg.crossOrigin = "anonymous";
+
+    bodyImg.src = body.src;
+    hatImg.src = hat.src;
+
+    bodyImg.onload = () => {
+      ctx.drawImage(bodyImg, 0, 0, canvas.width, canvas.height);
+
+      if (hat.style.display === "block") {
+        hatImg.onload = () => {
+          ctx.drawImage(hatImg, 0, 0, canvas.width, canvas.height);
+          save(canvas);
+        };
+      } else {
+        save(canvas);
+      }
+    };
+  });
+
+  function save(canvas) {
+    try {
+      const link = document.createElement("a");
+      link.download = "character.png";
+      link.href = canvas.toDataURL("image/png");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      alert("Download failed: " + err.message);
+    }
+  }
+</script>
+
+</body>
+</html>
